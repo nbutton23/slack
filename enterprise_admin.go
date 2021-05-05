@@ -28,7 +28,7 @@ import (
 // orgChannel: True if channel has to be converted to an org channel.
 // targetTeamIDs: A list of workspaces to which the channel should be shared. Not required if the channel is being shared org-wide.
 // teamID: The workspace to which the channel belongs. Set to empty if the channel is a cross-workspace shared channel.
-func (api *Client) AdminConversatinsSetTeams(ctx context.Context, channelID string, orgChannel bool, targetTeamIDs []string, teamID string) error {
+func (api *Client) AdminConversationsSetTeams(ctx context.Context, channelID string, orgChannel bool, targetTeamIDs []string, teamID string) error {
 
 	values := url.Values{
 		"token":       {api.token},
@@ -52,4 +52,20 @@ func (api *Client) AdminConversatinsSetTeams(ctx context.Context, channelID stri
 	}
 
 	return nil
+}
+
+func (api *Client) AdminConversationsCreate(ctx context.Context, channelName string, teamID string, isPrivate bool) (*Channel, error) {
+	values := url.Values{
+		"token":      {api.token},
+		"name":       {channelName},
+		"is_private": {strconv.FormatBool(isPrivate)},
+		"team_id":    {teamID},
+	}
+
+	response, err := api.channelRequest(ctx, "admin.conversations.create", values)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.Channel, nil
 }
