@@ -357,6 +357,27 @@ func (api *Client) CreateConversationContext(ctx context.Context, channelName st
 	return &response.Channel, nil
 }
 
+// CreateConversationWithTeam initiates a public or private channel-based conversation
+func (api *Client) CreateConversationWithTeam(channelName string, teamID string, isPrivate bool) (*Channel, error) {
+	return api.CreateConversationWithTeamContext(context.Background(), channelName, teamID, isPrivate)
+}
+
+// CreateConversationWithTeamContext initiates a public or private channel-based conversation with a custom context
+func (api *Client) CreateConversationWithTeamContext(ctx context.Context, channelName string, teamID string, isPrivate bool) (*Channel, error) {
+	values := url.Values{
+		"token":      {api.token},
+		"name":       {channelName},
+		"is_private": {strconv.FormatBool(isPrivate)},
+		"team_id":    {teamID},
+	}
+	response, err := api.channelRequest(ctx, "conversations.create", values)
+	if err != nil {
+		return nil, err
+	}
+
+	return &response.Channel, nil
+}
+
 // GetConversationInfo retrieves information about a conversation
 func (api *Client) GetConversationInfo(channelID string, includeLocale bool) (*Channel, error) {
 	return api.GetConversationInfoContext(context.Background(), channelID, includeLocale)
